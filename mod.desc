@@ -1,0 +1,12 @@
+<mod>
+	<title> Sandbox 1.0.1 </title>
+	<desc> Sandbox is a mod that lets you use the BF2 engine to build structures, set up racetracks, ramps, and much much more. This is all done from an easy Command Rose interface in-game. There are a variety of objects to choose from when building a creation - and once you're done, you can save it and send it to your friends. Multiplayer support is also included so many players can collaboratively construct buildings, have wars, hit each other with barrels, and anything else they can imagine. </desc>
+	<url> http://sandboxmod.com </url>
+	<logo> mod.png </logo>
+	<icon> mod_icon.png </icon>
+	<music> common/Music/menu.ogg </music>
+	<version> 1.0.1 </version>
+	<default_soldier_template> us_light_soldier </default_soldier_template>
+	<default_soldier_kit_template> us_specops </default_soldier_kit_template>
+	<parentmod> bf2 </parentmod>
+</mod>

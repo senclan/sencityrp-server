@@ -1,0 +1,47 @@
+rem ## Add-on: Dirtbike ##
+fileManager.mountArchive packages/dirtbike/objects_client.zip Objects
+fileManager.mountArchive packages/dirtbike/menu_client.zip Menu
+
+rem ## AF packages ##
+fileManager.mountArchive packages/af/objects/common_client.zip Objects
+fileManager.mountArchive packages/af/objects/effects_client.zip Objects
+fileManager.mountArchive packages/af/objects/soldiers_client.zip Objects
+fileManager.mountArchive packages/af/objects/staticobjects_client.zip Objects
+fileManager.mountArchive packages/af/objects/vegitation_client.zip Objects
+fileManager.mountArchive packages/af/objects/vehicles_client.zip Objects
+
+rem ## EF packages ##
+fileManager.mountArchive packages/ef/objects/effects_client.zip Objects
+fileManager.mountArchive packages/ef/objects/vehicles_client.zip Objects
+
+rem ## SF packages ##
+fileManager.mountArchive packages/xp/objects/common_client.zip Objects
+fileManager.mountArchive packages/xp/objects/effects_client.zip Objects
+fileManager.mountArchive packages/xp/objects/kits_client.zip Objects
+fileManager.mountArchive packages/xp/objects/soldiers_client.zip Objects
+fileManager.mountArchive packages/xp/objects/staticobjects_client.zip Objects
+fileManager.mountArchive packages/xp/objects/vehicles_client.zip Objects
+fileManager.mountArchive packages/xp/objects/weapons_client.zip Objects
+fileManager.mountArchive packages/xp/menu_client.zip Menu
+
+rem ## BF2 packages ##
+fileManager.mountArchive packages/bf2/objects/common_client.zip Objects
+fileManager.mountArchive packages/bf2/objects/effects_client.zip Objects
+fileManager.mountArchive packages/bf2/objects/staticobjects_client.zip Objects
+fileManager.mountArchive packages/bf2/objects/vehicles_client.zip Objects
+fileManager.mountArchive packages/bf2/objects/weapons_client.zip Objects
+fileManager.mountArchive packages/bf2/common_client.zip Common
+fileManager.mountArchive packages/bf2/flashmenu_client.zip Menu
+fileManager.mountArchive packages/bf2/menu_client.zip Menu
+fileManager.mountArchive packages/bf2/fonts_client.zip Fonts
+
+rem ## Sandbox custom objects and stuff ##
+fileManager.mountArchive packages/sbx/objects_client.zip Objects
+fileManager.mountArchive packages/sbx/music_client.zip Common
+
+rem ## Base BF2 crap ##
+fileManager.mountArchive mods/bf2/Objects_client.zip Objects
+fileManager.mountArchive mods/bf2/Common_client.zip Common
+fileManager.mountArchive mods/bf2/Menu_client.zip Menu
+fileManager.mountArchive mods/bf2/Fonts_client.zip Fonts
+fileManager.mountArchive mods/bf2/Shaders_client.zip Shaders

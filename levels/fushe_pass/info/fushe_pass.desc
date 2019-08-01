@@ -1,0 +1,11 @@
+<map gsid="103">
+	<name> FuShe Pass </name>
+	<briefing locid="FUSHE PASS">map description for modders maps not localized (english only)</briefing>
+	<music> common/sound/menu/music/load_CH_music.ogg </music>
+	<modes>
+		<mode type="gpm_cq">
+			<maptype players="64" type="headon" locid="GAMEMODE_DESCRIPTION_headon">Unlocalized test for this mode on this map</maptype>
+		</mode>
+		</mode>
+	</modes>
+</map>

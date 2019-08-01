@@ -1,0 +1,10 @@
+<map plasma="0" gsid="601">
+	<name> Wake Island 2007 </name>
+	<briefing locid="WAKE ISLAND 2007">map description for modders maps not localized (english only)</briefing>
+	<music> common/sound/menu/music/load_CH_music.ogg </music>
+	<modes>
+		<mode type="gpm_cq">
+			<maptype players="64" type="headon" locid="GAMEMODE_DESCRIPTION_headon">Unlocalized test for this mode on this map</maptype>
+		</mode>
+	</modes>
+</map>

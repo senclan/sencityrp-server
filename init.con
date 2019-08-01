@@ -1,0 +1,10 @@
+rem ** gameLogic hasn't been initialized yet **
+
+
+
+rem ** Intro Movies **
+
+rem bf2Engine.playMovie Movies\intro.bik 0
+
+rem *** Load multiplayer free camera here
+rem run Common/FreeCamera/Object.con

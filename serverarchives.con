@@ -1,0 +1,44 @@
+rem ## Add-On: Dirtbike ##
+fileManager.mountArchive packages/dirtbike/objects_server.zip Objects
+
+rem ## AF packages ##
+fileManager.mountArchive packages/af/objects/common_server.zip Objects
+fileManager.mountArchive packages/af/objects/effects_server.zip Objects
+fileManager.mountArchive packages/af/objects/staticobjects_server.zip Objects
+fileManager.mountArchive packages/af/objects/vegitation_server.zip Objects
+fileManager.mountArchive packages/af/objects/vehicles_server.zip Objects
+
+rem ## EF packages ##
+fileManager.mountArchive packages/ef/objects/effects_server.zip Objects
+fileManager.mountArchive packages/ef/objects/vehicles_server.zip Objects
+
+rem ## SF packages ##
+fileManager.mountArchive packages/xp/objects/common_server.zip Objects
+fileManager.mountArchive packages/xp/objects/effects_server.zip Objects
+fileManager.mountArchive packages/xp/objects/kits_server.zip Objects
+fileManager.mountArchive packages/xp/objects/soldiers_server.zip Objects
+fileManager.mountArchive packages/xp/objects/staticobjects_server.zip Objects
+fileManager.mountArchive packages/xp/objects/vehicles_server.zip Objects
+fileManager.mountArchive packages/xp/objects/weapons_server.zip Objects
+fileManager.mountArchive packages/xp/menu_server.zip Menu
+
+rem ## BF2 packages ##
+fileManager.mountArchive packages/bf2/objects/common_server.zip Objects
+fileManager.mountArchive packages/bf2/objects/dynamicobjects_server.zip Objects
+fileManager.mountArchive packages/bf2/objects/effects_server.zip Objects
+fileManager.mountArchive packages/bf2/objects/kits_server.zip Objects
+fileManager.mountArchive packages/bf2/objects/soldiers_server.zip Objects
+fileManager.mountArchive packages/bf2/objects/vehicles_server.zip Objects
+fileManager.mountArchive packages/bf2/objects/weapons_server.zip Objects
+fileManager.mountArchive packages/bf2/menu_server.zip Menu
+fileManager.mountArchive packages/bf2/common_server.zip Common
+
+rem ## Sandbox custom objects ##
+fileManager.mountArchive packages/sbx/objects_server.zip Objects
+fileManager.mountArchive packages/sbx/extra_objects_server.zip Objects
+fileManager.mountArchive packages/sbx/common_server.zip Common
+
+rem ## Base BF2 crap ##
+fileManager.mountArchive mods/bf2/Objects_server.zip Objects
+fileManager.mountArchive mods/bf2/Menu_server.zip Menu
+fileManager.mountArchive mods/bf2/Common_server.zip Common

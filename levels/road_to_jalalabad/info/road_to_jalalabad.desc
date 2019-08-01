@@ -1,0 +1,11 @@
+<map gsid="12">
+	<name> Road To Jalalabad </name>
+	<briefing locid="ROAD TO JALALABAD">map description for modders maps not localized (english only)</briefing>
+	<music> common/sound/menu/music/load_MEC_music.ogg </music>
+	<modes>
+	<mode type="gpm_cq">
+			<maptype players="64" type="assault" locid="GAMEMODE_DESCRIPTION_assault">Unlocalized test for this mode on this map</maptype>
+		</mode>
+	</modes>
+</map>
+
