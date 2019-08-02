@@ -1,4 +1,4 @@
-# SEN City RP
+# SeN City RP
 
 ## This is not being developed further
 
@@ -10,7 +10,7 @@ current states. Not a lot of testing was done so use at your own risk.
 
 ## Introduction
 
-SEN City RP is roleplay addon for a Battlefield 2 mod,
+SeN City RP is roleplay addon for a Battlefield 2 mod,
 [Sandbox](http://sandboxmod.com).
 
 This addon was developed by Mike__MRM. Original map created by Bullace. Map
