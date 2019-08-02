@@ -6,7 +6,7 @@ This was one of my first python projects. When talking with friends and
 reminiscing of old times, I decided to put the code up on here.
 
 The files in here were for the most part just pulled and added to git in their
-current states. Use at your own risk.
+current states. Not a lot of testing was done so use at your own risk.
 
 ## Introduction
 
