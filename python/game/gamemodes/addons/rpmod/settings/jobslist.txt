@@ -1,0 +1,14 @@
+;How To: *Ignore the ";" those are comments*
+;police | arrest=1 | unarrest=1 | salary=45 | maxingroup=0
+;everything after it is what the job has the ability to do
+;========================
+Ped | salary=30 | freeroam=1 | maxingroup=0 | description=Just a pedestrian
+Store Owner | salary=50 | freeroam=1 | maxingroup=4 | description=Your just a store owner
+Police Officer | arrest=1 | unarrest=1 | freeroam=1 | salary=55 | maxingroup=4 | description=A Police Officer
+Gas Station Attendant | buygas=1 | salary=50 | maxingroup=2 | description=Give people gas
+Mechanic | repair=1 | salary=55 | maxingroup=1 | description=Repair a vehicle when needed, max repair is for 100 dollars
+Restaurant Owner | feed=1 | salary=50 | maxingroup=3 | description=Restaurant Owner, feed people
+Car Salesman | sellcar=1 | closesale=1 | salary=50 | maxingroup=1 | description=A Car Salesman
+Trash Man | salary=40 | freeroam=1 | maxingroup=1 | description=Go around and pic up trash!
+Delivery Man | salary=40 | freeroam=1 | maxingroup=5 | delivery=1 | description=Deliver from point A to point B
+Taxi | salary=40 | freeroam=1 | maxingroup=3 | startmeter=1 | stopmeter=1 | description=Take players to there desired location

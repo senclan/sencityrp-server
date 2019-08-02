@@ -22,8 +22,8 @@ import math
 
 from socket import *
 import md5
-import sbxSettings
-import sbxNetwork
+import sbxSettings 
+
 
 class sbxGame_build(sbxCore):
 
@@ -33,6 +33,7 @@ class sbxGame_build(sbxCore):
 		self.obj_freeze = {}
 		self.groups = []
 		self.animations = []
+		self.loadedSettings = 0
 
 	def tickFrame(self):
 		self.onGrabTimer()
@@ -97,6 +98,7 @@ class sbxGame_build(sbxCore):
 		if self.settings.disconnectTime and len(self.offlineplayers):
 			for p in self.getOfflinePlayers():
 				if p.objects and p.disconnectTime and (host.timer_getWallTime() - p.disconnectTime) >= self.settings.disconnectTime:
+					self.addonCallback("onDellOfflinePlayer", p)
 					for obj in list(p.objects):
 						self.cleanDeleteObject(obj)
 					self.sendMsg(p.getName() + " - Player was offline, objects cleared")
@@ -132,6 +134,7 @@ class sbxGame_build(sbxCore):
 	def cacheObject(self, oName, oPos, oRot, p, ignoreAutograb=False):
 		if not self.objCache.has_key(oName): self.objCache[oName] = []
 		self.objCache[oName].append([oPos,oRot,p,ignoreAutograb])
+		
 	
 	def checkObjectCount(self, add=0):
 		if self.multiplayer and self.objectCount + add > self.settings.mpObjectLimit: return False
@@ -176,6 +179,7 @@ class sbxGame_build(sbxCore):
 		if not self.checkObjectCount(1):
 			p.sendMsg("OBJLIMITREACHED")
 			return
+		if not self.addonCallback("createObject", p, params): return
 		if params:
 			oName = params[0]
 			if ((oName not in self.settings.sbxObjects) and (oName not in self.settings.vehicles) and (oName not in self.settings.dynamic_objects)):
@@ -197,6 +201,7 @@ class sbxGame_build(sbxCore):
 		self.cacheObject(oName,oPos,oRot,p)
 		self.queueObject(oName,oPos,oRot,p.getTeam())
 		p.lastTemplate = oName
+		if not self.addonCallback("createdObject", p, oName): return
 		if (self.settings.dynamic_objects.count(oName) or self.settings.vehicles.count(oName)):
 			p.spawnDelay = self.settings.vehiclespawnDelay
 		else:
@@ -223,6 +228,7 @@ class sbxGame_build(sbxCore):
 		if closest[0]:
 			try:
 				o, oDist = closest
+				if not self.addonCallback("grabObject", p, o): return
 				oPos = o.getPosition()
 				if self.obj_freeze.has_key(o):
 					frozen = True
@@ -422,23 +428,6 @@ class sbxGame_build(sbxCore):
 		elif p.grabSnap == 2:
 			p.grabSnap = 1
 			p.sendMsg("GRABSNAP_RELATIVE")
-
-	def rcon_btnTracerDist(self, p, params):
-		if params[0] == "push":
-			p.tracerDistance += 1
-		else:
-			p.tracerDistance -= 1
-		p.sendMsg("Tracer distance set to " + str(p.tracerDistance))
-		if not self.multiplayer:
-			children = p.getPrimaryWeapon().getChildren()
-			for child in children:
-				if child.templateName == "tracer":
-					pPos = p.getPrimaryWeapon().getPosition()
-					pCam = p.getSoldierCam()
-					pCamRot = pCam.getRotation()
-					sPos = sbxMath.getVectoredPosition(pPos,p.tracerDistance,p.getDefaultVehicle().getRotation(),pCamRot)
-					child.setPosition(sPos)
-
 	def rcon_btnRotSnap(self, p, params): # Steps through rotation snaps 1,5,10,15,etc.
 		if params[0] == "inc":
 			if p.rotationFactor >= 5:
@@ -469,12 +458,6 @@ class sbxGame_build(sbxCore):
 				self.obj_freeze[p.grabObject[0]] = [p.grabObject[0].getPosition(),p.grabObject[0].getRotation()]
 				p.lastAction.append([2,p.grabObject[0],p.grabObject[1],1])
 				p.grabObject = []
-
-	def rcon_btnGravity(self, p, params):
-		gravFactor = int(params[0])
-		self.settings.gravity += gravFactor
-		self.sendMsg("Gravity set to " + str(self.settings.gravity))
-		host.rcon_invoke("physics.gravity " + str(self.settings.gravity))
 
 	def rcon_btnAdGrab(self, p, params):
 		if params[0] == "1":
@@ -632,7 +615,7 @@ class sbxGame_build(sbxCore):
 		soldier = int(params[0])
 		kit = int(params[1])
 		if soldier >= 4 and soldier <= 6 and kit >= 0 and kit <= 6:
-			p.kits[soldier] = kit
+			p.kits[int(4)] = 0
 			print "Kit selected", soldier, kit
 
 	def rcon_verify(self, p, params):
@@ -646,67 +629,10 @@ class sbxGame_build(sbxCore):
 					try: bf2.gameLogic.sendRankEvent(p, p.level, 1)
 					except: ExceptionOutput()
 
-	def loadGroup(self, p, data):
-		objDefinitions = data.split("!")
-		objects = []
-		for oInfo in objDefinitions:
-			if oInfo:
-				oInfo = oInfo.split(";")
-				oName = oInfo[0].replace("_mp","")
-				if oName in self.settings.sbxObjects:
-					oName += "_mp"
-				else:
-					continue
-				oPos = oInfo[1].split(",")
-				oPos = (float(oPos[0]),float(oPos[1]),float(oPos[2]))
-				oRot = oInfo[2].split(",")
-				oRot = (float(oRot[0]),float(oRot[1]),float(oRot[2]))
-				objects.append([oName,oPos,oRot])
-		if not self.checkObjectCount(1):
-			p.sendMsg("OBJLIMITREACHED")
-			return
-		if objects:
-			if ((len(objects) <= self.settings.groupLoadLimit) or (self.multiplayer == False)):
-				self.rcon_btnEndGroup(p, ['null'])
-				self.rcon_btnStartGroup(p, ['null'])
-				p.selectedGroup.load = len(objects)
-				tPos = p.getTracerLocation()
-				for o in objects:
-					oName = o[0]
-					oPos = (tPos[0] + o[1][0], tPos[1] + o[1][1], tPos[2] + o[1][2])
-					oRot = o[2]
-					self.cacheObject(oName,oPos,oRot,p)
-					self.queueObject(oName,oPos,oRot)
-			else: p.sendMsg("GROUP_LIMITREACHED")
-
-	def saveGroup(self, g):
-		ret = ""
-		for (o,oData) in g.objectData.items():
-			oPos = oData[0]
-			oRot = o.getRotation()
-			ret += str(o.templateName) + ";" + str(oPos[0]) + "," + str(oPos[1]) + "," + str(oPos[2]) + ";" + str(oRot[0]) + "," + str(oRot[1]) + "," + str(oRot[2]) + "!"
-		return ret
-
 	#
 	# CHAT COMMANDS
 	#
-
-	def chat_info(self, p, params):
-		if self.multiplayer:
-			self.sendMsg(str(self.objectCount) + "/" + str(self.settings.mpObjectLimit) + " objects | Group size limit: " + str(self.settings.groupObjectLimit) + " | Group load limit: " + str(self.settings.groupLoadLimit))
-		else:
-			self.sendMsg(str(self.objectCount) + " objects")
-
-	def chat_owner(self, p, params):
-		if p.grabObject:
-			o = p.grabObject[0]
-			if hasattr(o, "owner"):
-				p.sendMsg("This is a " + str(o.templateName) + " spawned by " + str(o.owner.getName()))
-			else:
-				p.sendMsg("This is a " + str(o.templateName) + " with no owner. How sad.")
 	
-	def chat_version(self, p, params):
-		p.sendMsg("sbxCore " + str(self.COREVERSION) + ", sbxGame_build " + str(self.GPMVERSION))
 
 	def chat_delall(self, p, params):
 		p.lastAction = []
@@ -715,6 +641,7 @@ class sbxGame_build(sbxCore):
 		p.selectedAnimation = None
 		p.clearGrabbed()
 		for obj in list(p.objects):
+			if obj.templateName in self.settings.vehicles: continue
 			self.cleanDeleteObject(obj)
 		p.objects = []
 		p.sendMsg("All objects deleted.")
@@ -729,154 +656,6 @@ class sbxGame_build(sbxCore):
 			self.cleanDeleteObject(obj)
 		player.objects = []
 		player.sendMsg("All objects deleted.")
-
-	def chat_delallo(self, p, params):
-		if len(params) != 1: return
-		oTemplate = params[0]
-		for obj in list(self.objectsOfTemplate[oTemplate]):
-			self.cleanDeleteObject(obj)
-
-	def chat_setpermission(self, p, params):
-		if len(params) != 3: return
-		cat = params[0]
-		command = params[1]
-		level = int(params[2])
-		self.settings.permissions[cat][command] = level
-
-	def chat_savegroup(self, p, params):
-		if not p.selectedGroup:
-			self.rcon_btnSelectGroup(p, [])
-		if p.selectedGroup:
-			filename = " ".join(params)
-			try: out_file = open(host.sgl_getModDirectory() + "/saved/" + str(filename) + ".bf2sbg","w")
-			except:
-				p.sendMsg("Could not open file for writing.")
-				return
-			out_file.write(self.saveGroup(p.selectedGroup))
-			out_file.close()
-			p.sendMsg("Your group has been saved as " + str(filename) + ".bf2sbg")
-
-	def chat_loadgroup(self, p, params):
-		filename = " ".join(params)
-		try: in_file = open(host.sgl_getModDirectory() + "/saved/" + str(filename) + ".bf2sbg","r")
-		except:
-			p.sendMsg("The file you specified was not found.")
-			return
-		data = in_file.read()
-		in_file.close()
-		if data:
-			try: self.loadGroup(p, data)
-			except: ExceptionOutput()
-
-	def chat_netloadgroup(self, p, params):
-		if p.saveDelay:
-			p.sendMsg("SAVEDELAY")
-			return
-		p.saveDelay = 10
-		filename = " ".join(params)
-		pName = p.getName()
-		pName = pName.split(" ")[-1]
-		try:
-			result = sbxNetwork.loadGroup(pName,p.getProfileId(),filename)
-		except:
-			ExceptionOutput()
-			p.saveDelay = 0
-			return
-		else:
-			if result:
-				if result.lower().find("error:") == -1:
-					try:
-						self.loadGroup(p, result)
-					except:
-						ExceptionOutput()
-					else:
-						p.saveDelay = self.settings.groupDupeDelay
-				else:
-					p.sendMsg(result)
-			else:
-				p.sendMsg("Unable to contact the Sandbox Network server.")
-
-	def chat_netsavegroup(self, p, params):
-		if not p.selectedGroup:
-			self.rcon_btnSelectGroup(p, [])
-		if p.selectedGroup:
-			if p.saveDelay:
-				p.sendMsg("SAVEDELAY")
-				return
-			p.saveDelay = 10
-			file_string = ""
-			increment = 0
-			filename = " ".join(params)
-			pName = p.getName()
-			pName = pName.split(" ")[-1]
-			data = self.saveGroup(p.selectedGroup)
-			inc = len(data.split("!")) - 1
-			result = False
-			try:
-				result = sbxNetwork.saveGroup(pName, p.getProfileId(), filename, data)
-			except:
-				ExceptionOutput()
-			if result:
-				p.sendMsg(result)
-				if result.lower().find("error:") != -1:
-					p.saveDelay = 10
-			else:
-				p.sendMsg("Unable to contact the Sandbox Network server.")
-			self.rcon_btnEndGroup(p, [])
-
-	def chat_save(self, p, params):
-		filename = params[0]
-		file_string = str(host.sgl_getMapName()) + "," + str(self.COREVERSION) + "@"
-		out_file = open(host.sgl_getModDirectory() + "/saved/" + str(filename) + ".bf2sbx","w")
-		increment = 0
-		for q in self.objects:
-			increment += 1
-			qPos = q.getPosition()
-			qRot = q.getRotation()
-			qNam = q.templateName
-			file_string += str(qNam) + ";" + str(qPos[0]) + "," + str(qPos[1]) + "," + str(qPos[2]) + ";" + str(qRot[0]) + "," + str(qRot[1]) + "," + str(qRot[2]) + "!"
-		out_file.write(file_string)
-		out_file.close()
-		p.sendMsg("Your sandbox has been saved as " + str(filename) + ".bf2sbx (" + str(increment) + " objects)")
-		self.dbg("Saved file, " + str(increment) + " objects")
-	
-	def chat_load(self, p, params):
-		filename = params[0]
-		try: in_file = open(host.sgl_getModDirectory() + "/saved/" + str(filename) + ".bf2sbx","r")
-		except:
-			p.sendMsg("The file you specified was not found.")
-			return
-		savedStr = in_file.read()
-		in_file.close()
-		a = savedStr.split("@")
-		w = a[0].split(",")
-		if not w.count(self.COREVERSION):
-			p.sendMsg("This file was created with a different version of Sandbox. Some objects may be loaded incorrectly.")
-		if w[0].lower() == str(host.sgl_getMapName()).lower():
-			p.sendMsg("Loading sandbox file...")
-			b = a[1].split("!")
-			increment = 0
-			for objInfo in b:
-				objInfo = objInfo.strip()
-				if objInfo:
-					objInfoList = objInfo.split(";")
-					print objInfoList
-					oName = objInfoList[0].lower().replace("_mp","")
-					oPos = objInfoList[1].split(",")
-					oPos = (float(oPos[0]), float(oPos[1]), float(oPos[2]))
-					oRot = objInfoList[2].split(",")
-					oRot = (float(oRot[0]), float(oRot[1]), float(oRot[2]))
-					if ((oName not in self.settings.sbxObjects) and (oName not in self.settings.vehicles) and (oName not in self.settings.dynamic_objects)):
-						continue
-					if oName in self.settings.sbxObjects and self.multiplayer:
-						oName += "_mp"
-					self.cacheObject(oName,oPos,oRot,p,True)
-					self.queueObject(oName,oPos,oRot)
-					increment += 1
-			p.sendMsg(str(filename) + ".bf2sbx has been loaded.")
-			self.dbg("Loaded file, " + str(increment) + " objects")
-		else:
-			p.sendMsg("The file you specified was not created in this map.")
 
 	def chat_rotfactor(self, p, params):
 		if int(params[0]) > 1 and int(params[0]) < 180:
@@ -908,15 +687,22 @@ class sbxGame_build(sbxCore):
 			self.settings.loadGameSettings()
 			if self.settings.mapObjectLimits.has_key(host.sgl_getMapName().lower()):
 				self.settings.mpObjectLimit = self.settings.mapObjectLimits[host.sgl_getMapName().lower()]
-
+		
 	def onPlayerSpawn(self, playerObject, soldierObject):
-		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 0 \"US_Zombie\" \"meinsurgent_heavy_soldier\"")
-		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 1 \"US_Zombie\" \"meinsurgent_heavy_soldier_3p\"")
-		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 2 \"US_Construction\" \"meinsurgent_soldier_jet\"")
-		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 3 \"US_Construction\" \"meinsurgent_soldier_jet_3p\"")
-		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 4 \"" + str(self.settings.kits[4][playerObject.kits[4]]) + "\" \"us_light_soldier\"")
-		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 5 \"" + str(self.settings.kits[5][playerObject.kits[5]]) + "\" \"mec_heavy_soldier\"")
-		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 6 \"" + str(self.settings.kits[6][playerObject.kits[6]]) + "\" \"ch_heavy_soldier\"")
+		kit = "RP_Player"
+		try:
+			kit = self.addonCallbackReturn("onPlayerSpawnKit", playerObject)
+		except:
+			kit = "RP_Player"
+			ExceptionOutput()
+		print "Kit: " + str(kit)
+		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 0 \"" + str(kit) + "\" \"meinsurgent_soldier\"")
+		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 1 \"" + str(kit) + "\" \"meinsurgent_soldier\"")
+		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 2 \"" + str(kit) + "\" \"meinsurgent_soldier\"")
+		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 3 \"" + str(kit) + "\" \"meinsurgent_soldier\"")
+		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 4 \"" + str(kit) + "\" \"meinsurgent_soldier\"")
+		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 5 \"" + str(kit) + "\" \"meinsurgent_soldier\"")
+		host.rcon_invoke("gameLogic.setKit " + str(playerObject.getTeam()) + " 6 \"" + str(kit) + "\" \"meinsurgent_soldier\"")
 
 		if playerObject.firstSpawn == True:
 			playerObject.firstSpawn = False

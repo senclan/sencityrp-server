@@ -29,6 +29,7 @@ class sbxCore:
 		self.registerHandlers()
 		self.registerTimers()
 		self.loadAddonsFromSettings()
+		self.allowedToChat = 1
 
 	# initSbx() is called whenever the round is restarted
 	def initSbx(self):
@@ -356,6 +357,21 @@ class sbxCore:
 						ExceptionOutput()
 		return r
 
+	def addonCallbackReturn(self, func, *args):
+		r = False
+		for a in self.addons:
+			if hasattr(a, "obj"):
+				if hasattr(a.obj, func):
+					try:
+						method = getattr(a.obj, func)
+						result = method(*args)
+						if result:
+							r = result
+					except:
+						print "addonCallback failed:", a.id, func
+						ExceptionOutput()
+		return r
+
 	##################
 	# Event Handlers #
 	##################
@@ -492,6 +508,10 @@ class sbxCore:
 		try: p = self.registerPlayer(playerObject)
 		except: ExceptionOutput()
 		p.connectTime = host.timer_getWallTime()
+		if self.allowedToChat == 1:
+			p.allowedToChat = 1
+		else:
+			p.allowedToChat = 0
 		if self.addonCallback("onPlayerConnect", p): return
 		try: self.onPlayerConnect(p)
 		except: ExceptionOutput()
@@ -515,13 +535,15 @@ class sbxCore:
 	def coreChatMessage(self, playerId, text, channel, flags):
 		if playerId == -1: #fix for local servers
 			playerId = 255
-		command, parameter = self.decodeChatMessage(text)
+		
+		command, parameter = self.decodeChatMessage(self.getPlayerByIndex(playerId), text)
 		if command:
 			p = self.getPlayerByIndex(playerId)
 			if not self.settings.checkPermission(p, "chat", command):
 				print "Insufficient permissions - " + str(p.getName()) + ", chat_" + str(command)
 				return
-			if parameter: parameters = parameter.split(" ")
+			if parameter:
+				parameters = parameter.split(" ")
 			else: parameters = []
 			self.addonCallback("chat_"+command, p, parameters)
 			if hasattr(self, ('chat_' + command)):
@@ -594,15 +616,27 @@ class sbxCore:
 		host.rcon_invoke("ObjectTemplate.setObjectTemplate 2 " + oName)
 		host.rcon_invoke("ObjectTemplate.minSpawnDelay 700000")
 		host.rcon_invoke("ObjectTemplate.maxSpawnDelay 900000")
+		host.rcon_invoke("ObjectTemplate.Distance 99999999")
+		host.rcon_invoke("ObjectTemplate.TimeToLive 99999999")
 		self.spawnerTemplates.append(oName)
 
-	def decodeChatMessage(self, text):
+	def decodeChatMessage(self, p, text):
 		text = text.replace( "HUD_TEXT_CHAT_TEAM", "" )
 		text = text.replace( "HUD_TEXT_CHAT_SQUAD", "" )
 		text = text.replace( "HUD_CHAT_DEADPREFIX", "" )
 		text = text.replace( "*\xA71DEAD\xA70*", "" )
 		command = None
 		parameter = None
+		
+		if text[0] == "/":
+			params = text.split(" ")
+			if len(params) == 0:
+				params = [str(text)]
+			params[0] = str(params[0].replace("/", ""))
+			self.addonCallback("chat_rp", p, params)
+			return None, None
+			
+		
 		if text[0:1] == "@":
 			pattern = re.compile(r'@(\w*) ?(.*)')
 			matches = pattern.findall(text)

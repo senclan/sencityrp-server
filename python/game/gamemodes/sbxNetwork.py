@@ -8,7 +8,7 @@
 
 import socket
 
-host = "66.96.233.135"
+host = "www.sandboxmod.com"
 path = "/~sandbox/network/server2.0/"
 
 def http_post(host, port = 80, document = "/",data="", timeout = 5):

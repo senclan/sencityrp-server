@@ -1,0 +1,2 @@
+salarytime=120
+jailtime=300

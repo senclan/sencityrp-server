@@ -26,13 +26,13 @@ class sbxPlayer:
 		self.cacheName = self.bf2PlayerObject.getName()
 		self.cacheProfileId = self.bf2PlayerObject.getProfileId()
 
-		self.tracerDistance = 8
+		self.tracerDistance = 4
 		self.rotationFactor = 5.0
 		self.gridSnap = 0
 		self.grabMode = 1
 		self.grabSnap = 1
 		self.autoGrab = True
-		self.autoLock = False
+		self.autoLock = True
 		self.lastTemplate = ""
 		self.lastRotation = (0.0,0.0,0.0)
 		self.savedRotation = (0.0,0.0,0.0)
@@ -77,8 +77,12 @@ class sbxPlayer:
 
 	def getTracerLocation(self, distance = -1):
 		if distance == -1: distance = self.tracerDistance
+		if self.getVehicle() == self.getDefaultVehicle():
+			return sbxMath.getVectoredPosition(self.getDefaultVehicle().getPosition(), distance, self.getDefaultVehicle().getRotation(), self.getSoldierCam().getRotation())
+		else:
+			return sbxMath.getVectoredPosition(self.getVehicleRoot().getPosition(), distance, self.getVehicleRoot().getRotation(), self.getSoldierCam().getRotation())
 		return sbxMath.getVectoredPosition(self.getDefaultVehicle().getPosition(), distance, self.getDefaultVehicle().getRotation(), self.getSoldierCam().getRotation())
-
+		
 	def getSoldierCam(self):
 		parent = getRootParent(self.getDefaultVehicle())
 		kids = parent.getChildren()
@@ -88,6 +92,8 @@ class sbxPlayer:
 		for child in kids:
 			if child.templateName == "SoldierCameraChase":
 				return child
+	
+
 
 	def getPosition(self):
 		return self.getDefaultVehicle().getPosition()

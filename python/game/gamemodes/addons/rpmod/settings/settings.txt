@@ -1,0 +1,16 @@
+;Server RP Settings
+;Remember Time's are in seconds
+defaultbank=500
+salarytime=120
+jailtime=300
+worktime=1800
+offtime=1200
+servername="www.mikemrm.com =SeN= RP"
+welcomemsg="This is running SerenityRP v1.0"
+playersneededtostart=1
+spawntime=3
+mandowntime=1
+timelimit=0
+timetillhungery=1200
+defaulthealth=100
+hpConstructionHealth=150

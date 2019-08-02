@@ -1,0 +1,2 @@
+;Objects that are disabled
+fx_waterfall
