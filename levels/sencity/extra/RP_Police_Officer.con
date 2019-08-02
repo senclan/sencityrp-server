@@ -1,0 +1,50 @@
+ObjectTemplate.create Kit RP_Mechanic
+ObjectTemplate.saveInSeparateFile 1
+ObjectTemplate.networkableInfo KitInfo
+ObjectTemplate.kitType Assault
+ObjectTemplate.aiTemplate Assault
+ObjectTemplate.geometry meinsurgent_kits
+ObjectTemplate.geometry.kit 6
+ObjectTemplate.geometry.dropGeom 15
+ObjectTemplate.setHasCollisionPhysics 1
+ObjectTemplate.abilityRestoreRate 0.05
+ObjectTemplate.abilityInVehicleRadius 7
+ObjectTemplate.abilityInVehicleStrength 0.1
+ObjectTemplate.abilityInVehicleMaterial 84
+ObjectTemplate.dropHeadwear helmet
+ObjectTemplate.unlockIndex 1
+ObjectTemplate.cullRadiusScale 2.4
+
+rem -------------------------------------
+ObjectTemplate.addTemplate kni_knife
+
+ObjectTemplate.addTemplate USPIS_92FS
+ObjectTemplate.addTemplate USRIF_M4
+
+ObjectTemplate.addTemplate wrench2
+rem -------------------------------------
+
+ObjectTemplate.createComponent Ability
+ObjectTemplate.ability.hasRepairingAbility 1
+
+ObjectTemplate.createComponent AbilityHud
+ObjectTemplate.abilityHud.ammoSound S_Resupply
+ObjectTemplate.abilityHud.healingSound S_Heal
+ObjectTemplate.abilityHud.repairingSound S_Repair
+
+ObjectTemplate.createComponent VehicleHud
+ObjectTemplate.vehicleHud.hudName 		"Construction"
+ObjectTemplate.vehicleHud.miniMapIcon		"Ingame\Kits\Icons\kit_Light_Assault_outline.tga"
+ObjectTemplate.vehicleHud.vehicleIcon		"Ingame\Kits\Icons\kit_Light_Assault.tga"
+ObjectTemplate.vehicleHud.spottedIcon 		"Ingame\Player\Icons\Minimap\mini_Soldier.dds"
+ObjectTemplate.vehicleHud.abilityIcon 		"Ingame\Weapons\Icons\Hud\SpecialKitIcons\kevlarVest.tga"
+ObjectTemplate.vehicleHud.pantingSound		S_SprintBreath
+ObjectTemplate.vehicleHud.injurySound		S_Injury
+ObjectTemplate.vehicleHud.vehicleType 		7
+
+ObjectTemplate.sprintStaminaDissipationFactor 0.01
+
+rem ---BeginComp:Radio ---
+ObjectTemplate.createComponent Radio
+ObjectTemplate.Radio.spottedMessage	"infantry_spotted"
+rem ---EndComp ---
