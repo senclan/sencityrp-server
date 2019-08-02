@@ -1,7 +1,7 @@
 NAME 	= "SeN RP CODES"
 VERSION = "1.0."
 AUTHOR 	= "=SeN= Mike__MRM"
-WEBSITE = "www.serenity-clan.com"
+WEBSITE = "www.senclan.com"
 DESCRIPTION = "RP CODES FOR SEN CITY"
 
 from game.gamemodes.addons.rpmod.rpCore import rpCore

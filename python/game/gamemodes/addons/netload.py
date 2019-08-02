@@ -1,7 +1,7 @@
 NAME 	= "admin load"
 VERSION = "1.0"
 AUTHOR 	= "Mike__MRM"
-WEBSITE = "www.mikemrm.com"
+WEBSITE = "www.senclan.com"
 DESCRIPTION = "allows admins to load as big of a group as they want"
 HIDDEN = 1
 import bf2
